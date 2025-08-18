@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public void CargarEscena1()
     {
         SceneManager.LoadScene(1);
+        Debug.Log("Cargando");
     }
 
     // Método para salir del juego

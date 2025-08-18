@@ -9,7 +9,7 @@ public class MenuPun : MonoBehaviourPunCallbacks
 {
 
     private const string nicknameKey = "playerNickname";
-    private string nickname;
+    private string nickname = "Prueba";
     public void ConectButton()
     {
         PlayerPrefs.SetString(nicknameKey, nickname);
