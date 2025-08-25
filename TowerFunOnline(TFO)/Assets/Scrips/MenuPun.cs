@@ -41,9 +41,11 @@ public class MenuPun : MonoBehaviourPunCallbacks
     public void HandleConnectButton()
     {
         PlayerPrefs.SetString(nicknameKey, nickname);
+
         PhotonNetwork.NickName = nickname.ToUpper();
-        print(nickname+ "intenta conectarse");
+        print(nickname + "intenta conectarse...");
         PhotonNetwork.ConnectUsingSettings();
+
         connectionButton.interactable = false;
 
     }
@@ -51,7 +53,7 @@ public class MenuPun : MonoBehaviourPunCallbacks
    
     public override void OnConnectedToMaster()
     {
-        Debug.Log("conectando al master.....");
+        Debug.Log(nickname + " conectando al master");
         
         SceneManager.LoadScene(gameSceneName);
     }
