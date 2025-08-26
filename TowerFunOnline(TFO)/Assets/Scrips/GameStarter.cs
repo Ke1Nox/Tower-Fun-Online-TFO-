@@ -4,15 +4,14 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-[RequireComponent(typeof(PhotonView))]
 public class GameStarter : MonoBehaviourPunCallbacks
 {
     [Header("Prefabs & Spawns")]
-    [SerializeField] private GameObject playerPrefab;       // Debe estar en una carpeta Resources y el nombre exacto
-    [SerializeField] private Transform playerSpawn;          // Fallback si no hay lista
+    [SerializeField] private GameObject playerPrefab;           // usar GameObject para PhotonNetwork.Instantiate
+    [SerializeField] private Transform playerSpawn;             // fallback si la lista está vacía
     [SerializeField] private List<Transform> playerSpawnPositions = new List<Transform>();
 
-    private int currentSpawnIndex = -1;                      // <- arranca inválido para que los clientes esperen
+    private int currentSpawnIndex = 0;
 
     void Start()
     {
@@ -21,19 +20,20 @@ public class GameStarter : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        // Usar la corrutina que maneja el índice y la creación
         StartCoroutine(WaitForSpawnPoint());
     }
 
     private IEnumerator WaitForSpawnPoint()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient)
         {
-            if (currentSpawnIndex < 0) currentSpawnIndex = 0;   // master arranca en 0
+            // Espera a que el master haya seteado y replicado el índice
+            yield return new WaitUntil(() => currentSpawnIndex > -1);
         }
         else
         {
-            // Esperar a que el master lo sincronice por RPC
-            yield return new WaitUntil(() => currentSpawnIndex >= 0);
+            currentSpawnIndex = 0;
         }
 
         CreateAndSetUpPlayerInstance();
@@ -49,20 +49,14 @@ public class GameStarter : MonoBehaviourPunCallbacks
             playerPrefab.name,
             spawn != null ? spawn.position : Vector3.zero,
             spawn != null ? spawn.rotation : Quaternion.identity,
-            0
-        );
+            0);
 
-        // Seteo de nick en el player
-        var pv = player.GetComponent<PhotonView>();
-        if (pv != null)
-        {
-            pv.RPC("RPC_SetNickname", RpcTarget.AllBuffered,
-                PlayerPrefs.GetString("playerNickname", "Player"));
-        }
-        else
-        {
-            Debug.LogWarning("El prefab del Player no tiene PhotonView en la raíz.");
-        }
+        // Este RPC debe existir en el script del jugador
+        player.GetComponent<PhotonView>().RPC(
+            "RPC_SetNickname",
+            RpcTarget.AllBuffered,
+            PlayerPrefs.GetString("playerNickname", "Player")
+        );
     }
 
     private Transform GetPlayerSpawnPosition()
@@ -70,6 +64,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
         if (playerSpawnPositions == null || playerSpawnPositions.Count == 0)
             return playerSpawn;
 
+        // index seguro aunque haya más players que puntos
         int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
         return playerSpawnPositions[safeIndex];
     }
@@ -77,8 +72,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
     private void UpdateSpawnIndexForAll()
     {
         currentSpawnIndex++;
-        // Usa el photonView heredado (requiere que este objeto tenga PhotonView)
-        photonView.RPC(nameof(RPC_UpdateSpawnIndex), RpcTarget.AllBuffered, currentSpawnIndex);
+        GetComponent<PhotonView>().RPC(nameof(RPC_UpdateSpawnIndex), RpcTarget.AllBuffered, currentSpawnIndex);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)

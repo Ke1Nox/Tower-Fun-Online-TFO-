@@ -43,7 +43,7 @@ public class MenuPun : MonoBehaviourPunCallbacks
         PlayerPrefs.SetString(nicknameKey, nickname);
 
         PhotonNetwork.NickName = nickname.ToUpper();
-        print(nickname + "  intenta conectarse...");
+        print(nickname + "intenta conectarse...");
         PhotonNetwork.ConnectUsingSettings();
 
         connectionButton.interactable = false;
