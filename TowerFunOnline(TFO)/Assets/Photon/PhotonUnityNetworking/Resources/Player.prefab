@@ -15,7 +15,8 @@ GameObject:
   - component: {fileID: 4043366075672960492}
   - component: {fileID: -6946625529487639606}
   - component: {fileID: -2976276408301254847}
-  m_Layer: 0
+  - component: {fileID: 2275569156414613488}
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.8113208, g: 0.24875402, b: 0.25404933, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -125,13 +126,13 @@ Rigidbody2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 158013667626862983}
   m_BodyType: 0
-  m_Simulated: 0
+  m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -207,9 +208,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nicknameUI: {fileID: 3374257641786946346}
   moveSpeed: 3
-  collisionMask:
+  jumpForce: 7
+  groundMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
+--- !u!114 &2275569156414613488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158013667626862983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 283632b2ca2ddcc4caf13527058a4e9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1350508814745868332
 GameObject:
   m_ObjectHideFlags: 0
@@ -222,7 +236,7 @@ GameObject:
   - component: {fileID: 1680116605822936216}
   - component: {fileID: 8509409135872364137}
   - component: {fileID: 2930604770085475179}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +336,7 @@ GameObject:
   - component: {fileID: 9025248599304782528}
   - component: {fileID: 4995154426723315335}
   - component: {fileID: 3374257641786946346}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: NickName
   m_TagString: Untagged
   m_Icon: {fileID: 0}

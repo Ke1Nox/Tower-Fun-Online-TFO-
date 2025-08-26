@@ -1,50 +1,56 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
 
 public class SimplePlayer : MonoBehaviourPunCallbacks
 {
+    [Header("UI")]
     [SerializeField] private TextMeshProUGUI nicknameUI;
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private LayerMask collisionMask;
+
+    [Header("Movimiento")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private LayerMask groundMask;
 
     private PhotonView photonView;
-    public PhotonView PhotonView => photonView ??= GetComponent<PhotonView>();
+    private Rigidbody2D rb;
+    private bool isGrounded;
 
     void Start()
     {
-       photonView = GetComponent<PhotonView>();
+        photonView = GetComponent<PhotonView>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if (photonView.IsMine)
+        if (!photonView.IsMine) return;
+
+        float horizontal = Input.GetAxis("Horizontal");
+
+        // movimiento lateral
+        rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+
+        // saltar si está en el suelo
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-           float horizontal = Input.GetAxis("Horizontal"); 
-            float vertical = Input.GetAxis("Vertical");
-
-            Vector2 movement = new Vector2(horizontal, vertical) * moveSpeed * Time.deltaTime;
-
-            transform.Translate(movement);
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
-       
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!PhotonView.IsMine)
-            return;
-
-        if ((collisionMask.value & (1 << collision.transform.gameObject.layer)) > 0)
+        if (((1 << collision.gameObject.layer) & groundMask) != 0)
         {
-            PhotonView.RPC(
-                "RPC_InformCollision",
-                RpcTarget.AllBuffered,
-                PhotonNetwork.LocalPlayer.NickName
-            );
+            isGrounded = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (((1 << collision.gameObject.layer) & groundMask) != 0)
+        {
+            isGrounded = false;
         }
     }
 
