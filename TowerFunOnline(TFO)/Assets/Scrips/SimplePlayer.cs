@@ -22,7 +22,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!photonView.IsMine) return;
 
