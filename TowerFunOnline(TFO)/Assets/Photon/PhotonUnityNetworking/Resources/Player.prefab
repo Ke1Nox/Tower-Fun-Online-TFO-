@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nicknameUI: {fileID: 3374257641786946346}
-  moveSpeed: 3
-  jumpForce: 20
+  moveSpeed: 4
+  jumpForce: 18
   groundMask:
     serializedVersion: 2
     m_Bits: 8
