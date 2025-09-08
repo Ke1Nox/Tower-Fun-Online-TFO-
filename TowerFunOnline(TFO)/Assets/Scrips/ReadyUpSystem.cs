@@ -1,13 +1,16 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using System.Collections.Generic;
+
 
 public class ReadyUpSystem : MonoBehaviourPunCallbacks
 {
     public static ReadyUpSystem Instance;
 
     [SerializeField] private int minPlayersReady = 2;
+    [SerializeField] private TextMeshProUGUI logText; // Referencia al texto en pantalla
 
     private HashSet<int> readyPlayers = new HashSet<int>();
 
@@ -22,16 +25,18 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         {
             if (!readyPlayers.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
             {
-                photonView.RPC(nameof(RPC_SetPlayerReady), RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber);
+                photonView.RPC(nameof(RPC_SetPlayerReady), RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber, PhotonNetwork.NickName);
             }
         }
     }
 
     [PunRPC]
-    void RPC_SetPlayerReady(int actorNumber)
+    void RPC_SetPlayerReady(int actorNumber, string nickname)
     {
         readyPlayers.Add(actorNumber);
-        Debug.Log("Jugador " + actorNumber + " está listo. Total listos: " + readyPlayers.Count);
+        int totalPlayers = PhotonNetwork.CurrentRoom.PlayerCount;
+
+        ShowLog($"{nickname} está listo ({readyPlayers.Count}/{totalPlayers})");
 
         if (PhotonNetwork.IsMasterClient && readyPlayers.Count >= minPlayersReady)
         {
@@ -42,10 +47,21 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
     [PunRPC]
     void RPC_StartGame()
     {
+        ShowLog("¡La lava comienza a subir!");
         LavaRise lava = FindObjectOfType<LavaRise>();
         if (lava != null)
         {
             lava.StartRising();
+        }
+    }
+
+    private void ShowLog(string message)
+    {
+        Debug.Log(message);
+
+        if (logText != null)
+        {
+            logText.text += "\n" + message; // acumula mensajes
         }
     }
 }
