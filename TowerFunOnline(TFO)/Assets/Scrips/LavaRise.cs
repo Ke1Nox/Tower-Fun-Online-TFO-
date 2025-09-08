@@ -6,14 +6,7 @@ public class LavaRise : MonoBehaviour
     [SerializeField] private float riseSpeed = 1f; // Velocidad constante hacia arriba
 
 
-    void Start()
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // Arranca desactivada, la activa el GameReadyManager
-            enabled = false;
-        }
-    }
+  
 
     void Update()
     {
