@@ -10,7 +10,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
     public static ReadyUpSystem Instance;
 
     [SerializeField] private int minPlayersReady = 2;
-    [SerializeField] private TextMeshProUGUI logText; // Referencia al texto en pantalla
+    [SerializeField] private TextMeshProUGUI logText; 
 
     private HashSet<int> readyPlayers = new HashSet<int>();
 
@@ -61,7 +61,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
 
         if (logText != null)
         {
-            logText.text += "\n" + message; // acumula mensajes
+            logText.text += "\n" + message;
         }
     }
 }

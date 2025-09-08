@@ -28,7 +28,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            // Espera a que el master haya seteado y replicado el índice
+            
             yield return new WaitUntil(() => currentSpawnIndex > -1);
         }
         else
@@ -37,7 +37,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
         }
 
         CreateAndSetUpPlayerInstance();
-        UpdateSpawnIndexForAll();
+        //UpdateSpawnIndexForAll();
     }
 
     private void CreateAndSetUpPlayerInstance()
@@ -51,7 +51,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
             spawn != null ? spawn.rotation : Quaternion.identity,
             0);
 
-        // Este RPC debe existir en el script del jugador
+        
         player.GetComponent<PhotonView>().RPC(
             "RPC_SetNickname",
             RpcTarget.AllBuffered,
@@ -64,16 +64,16 @@ public class GameStarter : MonoBehaviourPunCallbacks
         if (playerSpawnPositions == null || playerSpawnPositions.Count == 0)
             return playerSpawn;
 
-        // index seguro aunque haya más players que puntos
+        
         int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
         return playerSpawnPositions[safeIndex];
     }
 
-    private void UpdateSpawnIndexForAll()
-    {
-        currentSpawnIndex++;
-        GetComponent<PhotonView>().RPC(nameof(RPC_UpdateSpawnIndex), RpcTarget.AllBuffered, currentSpawnIndex);
-    }
+    //private void UpdateSpawnIndexForAll()
+    //{
+    //    currentSpawnIndex++;
+    //    GetComponent<PhotonView>().RPC(nameof(RPC_UpdateSpawnIndex), RpcTarget.AllBuffered, currentSpawnIndex);
+    //}
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {

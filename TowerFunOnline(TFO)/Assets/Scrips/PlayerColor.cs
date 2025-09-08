@@ -10,7 +10,7 @@ public class PlayerColor : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
 
-        // Color aleatorio (RGB con valores entre 0 y 1)
+        
         Color randomColor = new Color(
             Random.value, // R
             Random.value, // G
