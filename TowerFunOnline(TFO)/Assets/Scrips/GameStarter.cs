@@ -45,13 +45,16 @@ public class GameStarter : MonoBehaviourPunCallbacks
         Transform spawn = GetPlayerSpawnPosition();
         if (spawn == null) spawn = playerSpawn;
 
+        // Calcular posición con un pequeño offset en X según cantidad de jugadores
+        int playerIndex = PhotonNetwork.CurrentRoom.PlayerCount - 1;
+        Vector3 spawnPosition = spawn.position + new Vector3(playerIndex * 2.5f, 0, 0);
+
         GameObject player = PhotonNetwork.Instantiate(
             playerPrefab.name,
-            spawn != null ? spawn.position : Vector3.zero,
-            spawn != null ? spawn.rotation : Quaternion.identity,
+            spawnPosition,
+            spawn.rotation,
             0);
 
-        
         player.GetComponent<PhotonView>().RPC(
             "RPC_SetNickname",
             RpcTarget.AllBuffered,
