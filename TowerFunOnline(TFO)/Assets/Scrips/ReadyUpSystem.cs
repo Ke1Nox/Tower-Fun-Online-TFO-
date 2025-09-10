@@ -4,19 +4,27 @@ using Photon.Realtime;
 using TMPro;
 using System.Collections.Generic;
 
-
 public class ReadyUpSystem : MonoBehaviourPunCallbacks
 {
     public static ReadyUpSystem Instance;
 
     [SerializeField] private int minPlayersReady = 2;
-    [SerializeField] private TextMeshProUGUI logText; 
+    [SerializeField] private TextMeshProUGUI logText;
 
     private HashSet<int> readyPlayers = new HashSet<int>();
 
     void Awake()
     {
         Instance = this;
+    }
+
+    void Start()
+    {
+        if (logText != null)
+        {
+            // Mensaje inicial para todos los jugadores
+            logText.text = "Presiona ENTER para estar listo.\n";
+        }
     }
 
     void Update()
@@ -41,6 +49,11 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient && readyPlayers.Count >= minPlayersReady)
         {
             photonView.RPC(nameof(RPC_StartGame), RpcTarget.AllBuffered);
+        }
+        else
+        {
+            int faltan = Mathf.Max(0, minPlayersReady - readyPlayers.Count);
+            ShowLog($"Faltan {faltan} jugador(es) más para iniciar.");
         }
     }
 
