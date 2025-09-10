@@ -28,13 +28,26 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
         float horizontal = Input.GetAxis("Horizontal");
 
-        // movimiento lateral
+      
         rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
 
-        // saltar si está en el suelo
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
+    }
+
+    //rotacion recto del nickname 
+    void LateUpdate()
+    {
+        if (nicknameUI != null)
+        {
+            // Siempre encima del jugador
+            Vector3 offset = new Vector3(0, 1f, 0); 
+            nicknameUI.transform.position = transform.position + offset;
+
+            // Mantener rotación fija 
+            nicknameUI.transform.rotation = Quaternion.identity;
         }
     }
 
