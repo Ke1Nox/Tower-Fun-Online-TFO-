@@ -10,7 +10,7 @@ public class LavaRise : MonoBehaviour
 
     void Update()
     {
-        // mover la lava hacia arriba constantemente
+        // Mover la lava hacia arriba constantemente
         transform.Translate(Vector3.up * riseSpeed * Time.deltaTime);
     }
 

@@ -7,8 +7,8 @@ using Photon.Realtime;
 public class GameStarter : MonoBehaviourPunCallbacks
 {
     [Header("Prefabs & Spawns")]
-    [SerializeField] private GameObject playerPrefab;           // usar GameObject para PhotonNetwork.Instantiate
-    [SerializeField] private Transform playerSpawn;             // fallback si la lista está vacía
+    [SerializeField] private GameObject playerPrefab;           // Usar GameObject para PhotonNetwork.Instantiate
+    [SerializeField] private Transform playerSpawn;             // Fallback si la lista esta vacia
     [SerializeField] private List<Transform> playerSpawnPositions = new List<Transform>();
 
     private int currentSpawnIndex = 0;
@@ -20,7 +20,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        // Usar la corrutina que maneja el índice y la creación
+        // Usar la corrutina que maneja el indice y la creacion
         StartCoroutine(WaitForSpawnPoint());
     }
 
@@ -28,7 +28,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            // Espera a que el master haya seteado y replicado el índice
+            // Espera a que el master haya seteado y replicado el indice
             yield return new WaitUntil(() => currentSpawnIndex > -1);
         }
         else
@@ -64,7 +64,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
         if (playerSpawnPositions == null || playerSpawnPositions.Count == 0)
             return playerSpawn;
 
-        // index seguro aunque haya más players que puntos
+        // Index seguro aunque haya mas players que puntos
         int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
         return playerSpawnPositions[safeIndex];
     }

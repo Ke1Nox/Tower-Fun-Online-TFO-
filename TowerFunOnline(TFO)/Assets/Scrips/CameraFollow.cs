@@ -20,7 +20,7 @@ public class CameraFollow : MonoBehaviour
             return;
         }
 
-        // seguir suavemente al target
+        // Seguir suavemente al target
         Vector3 desiredPosition = target.position + offset;
         transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5f);
     }

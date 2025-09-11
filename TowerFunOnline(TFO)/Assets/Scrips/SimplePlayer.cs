@@ -13,7 +13,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [SerializeField] private LayerMask groundMask;
 
     [Header("Empuje")]
-    [SerializeField] private float pushForce = 5f; // fuerza de empuje configurable
+    [SerializeField] private float pushForce = 5f; // Fuerza de empuje configurable
 
     private PhotonView photonView;
     private Rigidbody2D rb;
@@ -24,7 +24,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         photonView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody2D>();
 
-        // aseguramos que no rote cuando choca
+        // Aseguramos que no rote cuando choca
         rb.freezeRotation = true;
     }
 
@@ -34,10 +34,10 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
         float horizontal = Input.GetAxis("Horizontal");
 
-        // movimiento lateral
+        // Movimiento lateral
         rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
 
-        // saltar si está en el suelo
+        // Saltar si está en el suelo
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
@@ -46,27 +46,27 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // detectar suelo
+        // Detectar suelo
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
         {
             isGrounded = true;
         }
 
-        // 🔹 empujar a otros jugadores
-        if (!photonView.IsMine) return; // solo el jugador local maneja empuje
+        // Empujar a otros jugadores
+        if (!photonView.IsMine) return; // Solo el jugador local maneja empuje
 
         if (collision.gameObject.CompareTag("Player"))
         {
             PhotonView otherView = collision.gameObject.GetComponent<PhotonView>();
-            if (otherView != null && !otherView.IsMine) // empujar solo a otros
+            if (otherView != null && !otherView.IsMine) // Empujar solo a otros
             {
                 Rigidbody2D otherRb = collision.gameObject.GetComponent<Rigidbody2D>();
                 if (otherRb != null)
                 {
-                    // dirección desde mí hacia el otro jugador
+                    // Dirección desde mí hacia el otro jugador
                     Vector2 pushDir = (collision.transform.position - transform.position).normalized;
 
-                    // aplicar fuerza de empuje
+                    // Aplicar fuerza de empuje
                     otherRb.AddForce(pushDir * pushForce, ForceMode2D.Impulse);
                 }
             }

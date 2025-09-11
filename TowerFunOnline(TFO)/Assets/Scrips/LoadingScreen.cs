@@ -11,9 +11,7 @@ public class LoadingScreen : MonoBehaviour
 
     private static string targetScene;
 
-    /// <summary>
-    /// Llamar a esta función para cargar una escena con pantalla de carga.
-    /// </summary>
+    // Llamar a esta función para cargar una escena con pantalla de carga.
     public static void LoadScene(string sceneName)
     {
         targetScene = sceneName;
@@ -29,7 +27,7 @@ public class LoadingScreen : MonoBehaviour
 
     private IEnumerator LoadAsync()
     {
-        // 🔹 Cargar la escena objetivo en segundo plano
+        // Cargar la escena objetivo en segundo plano
         AsyncOperation op = SceneManager.LoadSceneAsync(targetScene, LoadSceneMode.Single);
         op.allowSceneActivation = false;
 
@@ -49,7 +47,7 @@ public class LoadingScreen : MonoBehaviour
                 // Activar la escena objetivo
                 op.allowSceneActivation = true;
 
-                // 🔹 Esperar un frame para que se active y después descargar LoadingScene
+                // Esperar un frame para que se active y después descargar LoadingScene
                 yield return null;
                 SceneManager.UnloadSceneAsync("LoadingScene");
             }

@@ -9,7 +9,7 @@ public class VictoryZone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // solo el dueño del jugador en Photon cambia de escena
+            // Solo el dueño del jugador en Photon cambia de escena
             var view = other.GetComponent<Photon.Pun.PhotonView>();
             if (view != null && view.IsMine)
             {

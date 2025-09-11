@@ -212,6 +212,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+  pushForce: 5
 --- !u!114 &2275569156414613488
 MonoBehaviour:
   m_ObjectHideFlags: 0
