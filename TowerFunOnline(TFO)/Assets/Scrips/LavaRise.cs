@@ -16,15 +16,17 @@ public class LavaRise : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Verificar si colisionó con un jugador
+        // Verificar si colisiona con un jugador
         if (other.CompareTag("Player"))
         {
             PhotonView view = other.GetComponent<PhotonView>();
 
-            // Solo el dueño del objeto puede destruirlo
+            // Solo el duelo del objeto puede destruirlo
             if (view != null && view.IsMine)
             {
                 PhotonNetwork.Destroy(other.gameObject);
+
+                UnityEngine.SceneManagement.SceneManager.LoadScene("DefeatScene");
             }
         }
     }

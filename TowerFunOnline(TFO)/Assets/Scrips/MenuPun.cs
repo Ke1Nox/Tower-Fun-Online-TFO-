@@ -55,6 +55,6 @@ public class MenuPun : MonoBehaviourPunCallbacks
     {
         Debug.Log(nickname + " conectando al master");
         
-        SceneManager.LoadScene(gameSceneName);
+        LoadingScreen.LoadScene(gameSceneName);
     }
 }

@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
+    path: Assets/Scenes/LoadingScene.unity
+    guid: d6abf6d109bda8e43a6ba33c88684814
+  - enabled: 1
     path: Assets/Scenes/Game.unity
     guid: abed0dfb28b3ee34da1d65443c16d38a
+  - enabled: 1
+    path: Assets/Scenes/DefeatScene.unity
+    guid: d7db5d416c3284c459aa806841916a29
+  - enabled: 1
+    path: Assets/Scenes/VictoryScene.unity
+    guid: bc1b31f86a880264eac609722ef0e2bc
   m_configObjects: {}
