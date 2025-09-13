@@ -22,19 +22,27 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private float horizontalInput;
+
     void Update()
     {
         if (!photonView.IsMine) return;
 
-        float horizontal = Input.GetAxis("Horizontal");
-
-      
-        rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+        // Guardamos el input, pero no tocamos la física acá
+        horizontalInput = Input.GetAxis("Horizontal");
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
+    }
+
+    void FixedUpdate()
+    {
+        if (!photonView.IsMine) return;
+
+        // Aplicamos movimiento en el ciclo de física
+        rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
     }
 
     //rotacion recto del nickname 
