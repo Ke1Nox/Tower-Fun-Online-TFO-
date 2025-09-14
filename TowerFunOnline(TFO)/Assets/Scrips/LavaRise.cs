@@ -1,10 +1,14 @@
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class LavaRise : MonoBehaviour
 {
     [SerializeField] private float riseSpeed = 1f;
     private bool isRising = false;
+
+    [Header("Escena al morir por lava (nombre en Build Settings)")]
+    public string loseSceneName = "LoseScene";
 
     void Update()
     {
@@ -19,13 +23,21 @@ public class LavaRise : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        PhotonView view = other.GetComponent<PhotonView>();
+        if (view != null && view.IsMine)
         {
-            PhotonView view = other.GetComponent<PhotonView>();
-            if (view != null && view.IsMine)
-            {
-                PhotonNetwork.Destroy(other.gameObject);
-            }
+            // Jugador local toca la lava -> escena de derrota
+            Debug.Log("LavaRise: Jugador local tocó la lava. Cargando LoseScene...");
+            // Opcional: destruir su GameObject para limpiar la escena antes de cambiar
+            PhotonNetwork.Destroy(other.gameObject);
+            SceneManager.LoadScene(loseSceneName);
+        }
+        else
+        {
+            // Si quieres, puedes destruir jugadores remotos también (opcional)
+            // PhotonNetwork.Destroy(other.gameObject);
         }
     }
 }
