@@ -13,7 +13,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [SerializeField] private float jumpForce = 7f;
     [SerializeField] private LayerMask groundMask;
 
-    [Header("Knockback (Opción B)")]
+    [Header("Knockback")]
     [SerializeField] private float knockbackTime = 0.25f;
     private float knockbackUntil = -1f;
 
@@ -26,7 +26,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     private float horizontal;
     private float lastHorizontal = 1f; // 1 derecha, -1 izquierda
 
-    [Header("Empujón (networked)")]
+    [Header("Empujón")]
     [Tooltip("Ruta dentro de Resources al prefab (ej: \"Prefabs/PushHitbox\")")]
     [SerializeField] private string pushHitboxPrefabPath = "Prefabs/PushHitbox";
     [SerializeField] private float pushOffset = 1f;
@@ -55,7 +55,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && lavaStarted)
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
-        // Empujón con tecla E
+       
         if (Input.GetKeyDown(KeyCode.E) && Time.time - lastPushTime >= pushCooldown)
         {
             DoPush();
@@ -67,7 +67,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine) return;
 
-        // Si estamos en knockback, NO pisamos la velocidad. Dejamos actuar la física.
+        //NO pisamos la velocidad actua la física.
         bool inKnockback = Time.time < knockbackUntil;
         if (inKnockback) return;
 
@@ -94,7 +94,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         // Instanciar en red
         GameObject go = PhotonNetwork.Instantiate(pushHitboxPrefabPath, spawnPos, Quaternion.identity);
 
-        // MUY IMPORTANTE: setear escala para que la PushHitbox lea la dirección (Mathf.Sign(localScale.x))
+        
         go.transform.localScale = new Vector3(dir, 1f, 1f);
     }
 
@@ -119,15 +119,15 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RPC_ApplyPush(float vx, float vy)
     {
-        // Solo el dueño aplica la fuerza localmente
+        
         if (!photonView.IsMine) return;
 
         if (rb == null) rb = GetComponent<Rigidbody2D>();
 
-        // (Opcional) Cancelar el input horizontal actual para que el knockback se note más
+       
         rb.velocity = new Vector2(0f, rb.velocity.y);
 
-        // Aplicar impulso y abrir ventana de knockback
+       
         rb.AddForce(new Vector2(vx, vy), ForceMode2D.Impulse);
         knockbackUntil = Time.time + knockbackTime;
 
