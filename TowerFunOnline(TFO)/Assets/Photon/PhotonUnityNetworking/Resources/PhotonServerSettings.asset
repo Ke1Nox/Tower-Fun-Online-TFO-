@@ -45,6 +45,7 @@ MonoBehaviour:
   - RPC_StartGame
   - RPC_ApplyKnockback
   - ApplyKnockback2D
+  - RPC_ApplyPush
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

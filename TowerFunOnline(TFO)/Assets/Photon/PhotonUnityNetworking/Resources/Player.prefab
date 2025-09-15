@@ -16,8 +16,6 @@ GameObject:
   - component: {fileID: -6946625529487639606}
   - component: {fileID: -2976276408301254847}
   - component: {fileID: 2275569156414613488}
-  - component: {fileID: -2950719095311347903}
-  - component: {fileID: 8020682991055957424}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -214,6 +212,9 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+  pushHitboxPrefabPath: Prefabs/PushHitbox
+  pushOffset: 1
+  pushCooldown: 0.6
 --- !u!114 &2275569156414613488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,41 +227,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 283632b2ca2ddcc4caf13527058a4e9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-2950719095311347903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158013667626862983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 709fbb76a156cd64ba8cffb650fbcca0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHorizontalSpeed: 14
-  maxVerticalSpeed: 20
---- !u!114 &8020682991055957424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 158013667626862983}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6bbdb15d75221248b7d5ae9e6931099, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushKey: 101
-  boxHalfExtents: {x: 2.5, y: 1.2}
-  boxDistance: 1.6
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 2147483647
-  pushForce: 12
-  verticalLift: 0
-  cooldown: 0.35
 --- !u!1 &1350508814745868332
 GameObject:
   m_ObjectHideFlags: 0
