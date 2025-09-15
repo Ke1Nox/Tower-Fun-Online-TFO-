@@ -8,7 +8,7 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        // Buscar al jugador local cuando aparezca
+        
         FindLocalPlayer();
     }
 
@@ -20,14 +20,14 @@ public class CameraFollow : MonoBehaviour
             return;
         }
 
-        // seguir suavemente al target
+        // camara sigue aal target
         Vector3 desiredPosition = target.position + offset;
         transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * 5f);
     }
 
     void FindLocalPlayer()
     {
-        // Busca todos los jugadores en la escena
+        // Buscar  jugadores en la escena for
         SimplePlayer[] players = FindObjectsOfType<SimplePlayer>();
         foreach (var p in players)
         {

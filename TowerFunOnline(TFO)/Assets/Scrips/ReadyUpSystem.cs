@@ -22,7 +22,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
     {
         if (logText != null)
         {
-            // Mensaje inicial para todos los jugadores
+           
             logText.text = "Presiona ENTER para estar listo.\n";
         }
     }

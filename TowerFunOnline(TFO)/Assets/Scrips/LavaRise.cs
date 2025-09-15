@@ -7,7 +7,7 @@ public class LavaRise : MonoBehaviour
     [SerializeField] private float riseSpeed = 1f;
     private bool isRising = false;
 
-    // Exponer el estado públicamente (solo lectura)
+    
     public bool IsRising
     {
         get { return isRising; }
@@ -35,14 +35,14 @@ public class LavaRise : MonoBehaviour
         PhotonView view = other.GetComponent<PhotonView>();
         if (view != null && view.IsMine)
         {
-            // Jugador local toca la lava -> escena de derrota
+            // Jugador local toca la lava  escena de derrota
             Debug.Log("LavaRise: Jugador local tocó la lava. Cargando LoseScene...");
             PhotonNetwork.Destroy(other.gameObject);
             UnityEngine.SceneManagement.SceneManager.LoadScene(loseSceneName);
         }
         else
         {
-            // Si querés manejar jugadores remotos, hacerlo aquí (opcional)
+            
         }
     }
 }

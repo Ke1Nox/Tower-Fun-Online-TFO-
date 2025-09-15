@@ -7,8 +7,8 @@ using Photon.Realtime;
 public class GameStarter : MonoBehaviourPunCallbacks
 {
     [Header("Prefabs & Spawns")]
-    [SerializeField] private GameObject playerPrefab;           // usar GameObject para PhotonNetwork.Instantiate
-    [SerializeField] private Transform playerSpawn;             // fallback si la lista está vacía
+    [SerializeField] private GameObject playerPrefab;           
+    [SerializeField] private Transform playerSpawn;             
     [SerializeField] private List<Transform> playerSpawnPositions = new List<Transform>();
 
     private int currentSpawnIndex = 0;
@@ -20,7 +20,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        // Usar la corrutina que maneja el índice y la creación
+        
         StartCoroutine(WaitForSpawnPoint());
     }
 
