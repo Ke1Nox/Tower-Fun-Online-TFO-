@@ -40,13 +40,13 @@ public class GameStarter : MonoBehaviourPunCallbacks
         //UpdateSpawnIndexForAll();
     }
 
-    //spawner:
+    // Spawner:
     private void CreateAndSetUpPlayerInstance()
     {
         Transform spawn = GetPlayerSpawnPosition();
         if (spawn == null) spawn = playerSpawn;
 
-        //distancias entre spawns 
+        // Distancias entre spawns 
         int playerIndex = PhotonNetwork.CurrentRoom.PlayerCount - 1;
         Vector3 spawnPosition = spawn.position + new Vector3(playerIndex * 2.5f, 0, 0);
 

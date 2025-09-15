@@ -37,7 +37,7 @@ public class GoalPlatform : MonoBehaviour
        
         PhotonNetwork.CurrentRoom.SetCustomProperties(props);
 
-        Debug.Log($"GoalPlatform: Jugador {pv.Owner.NickName} (actor {pv.Owner.ActorNumber}) alcanzó la meta.");
+        Debug.Log($"GoalPlatform: Jugador {pv.Owner.NickName} (actor {pv.Owner.ActorNumber}) alcanzo la meta.");
     }
 }
 

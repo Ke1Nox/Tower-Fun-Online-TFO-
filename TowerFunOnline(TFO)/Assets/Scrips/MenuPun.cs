@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-
 public class MenuPun : MonoBehaviourPunCallbacks
 {
     public string gameSceneName;
@@ -15,8 +14,6 @@ public class MenuPun : MonoBehaviourPunCallbacks
 
     private const string nicknameKey = "playerNickname";
     private string nickname;
-
-
 
     private void Start()
     {
@@ -43,20 +40,18 @@ public class MenuPun : MonoBehaviourPunCallbacks
         PlayerPrefs.SetString(nicknameKey, nickname);
 
         PhotonNetwork.NickName = nickname.ToUpper();
-        print(nickname + "intenta conectarse...");
+        Debug.Log(nickname + " intenta conectarse...");
         PhotonNetwork.ConnectUsingSettings();
 
         connectionButton.interactable = false;
-
     }
 
-   
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.SendRate = 30;
         PhotonNetwork.SerializationRate = 20;
-        Debug.Log(nickname + " conectando al master");
-        
-        SceneManager.LoadScene(gameSceneName);
+        Debug.Log(nickname + " conectado al master");
+
+        LoadingScreen.LoadScene(gameSceneName);
     }
 }

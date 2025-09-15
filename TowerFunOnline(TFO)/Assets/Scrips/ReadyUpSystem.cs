@@ -44,7 +44,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         readyPlayers.Add(actorNumber);
         int totalPlayers = PhotonNetwork.CurrentRoom.PlayerCount;
 
-        ShowLog($"{nickname} está listo ({readyPlayers.Count}/{totalPlayers})");
+        ShowLog($"{nickname} esta listo ({readyPlayers.Count}/{totalPlayers})");
 
         if (PhotonNetwork.IsMasterClient && readyPlayers.Count >= minPlayersReady)
         {
@@ -53,14 +53,14 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         else
         {
             int faltan = Mathf.Max(0, minPlayersReady - readyPlayers.Count);
-            ShowLog($"Faltan {faltan} jugador(es) más para iniciar.");
+            ShowLog($"Faltan {faltan} jugador(es) mas para iniciar.");
         }
     }
 
     [PunRPC]
     void RPC_StartGame()
     {
-        ShowLog("¡La lava comienza a subir!");
+        ShowLog("La lava comienza a subir!");
         LavaRise lava = FindObjectOfType<LavaRise>();
         if (lava != null)
         {

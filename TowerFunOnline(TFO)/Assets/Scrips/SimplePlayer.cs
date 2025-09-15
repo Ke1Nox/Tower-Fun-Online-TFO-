@@ -67,7 +67,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine) return;
 
-        //NO pisamos la velocidad actua la física.
+        // NO pisamos la velocidad actua la física.
         bool inKnockback = Time.time < knockbackUntil;
         if (inKnockback) return;
 
