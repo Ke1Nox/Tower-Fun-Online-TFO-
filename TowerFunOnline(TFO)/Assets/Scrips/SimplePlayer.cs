@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
@@ -13,11 +13,25 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [SerializeField] private float jumpForce = 7f;
     [SerializeField] private LayerMask groundMask;
 
+    [Header("Knockback (Opci√≥n B)")]
+    [SerializeField] private float knockbackTime = 0.25f;
+    private float knockbackUntil = -1f;
+
     private PhotonView photonView;
     private Rigidbody2D rb;
     private bool isGrounded;
 
     private LavaRise lava;
+
+    private float horizontal;
+    private float lastHorizontal = 1f; // 1 derecha, -1 izquierda
+
+    [Header("Empuj√≥n (networked)")]
+    [Tooltip("Ruta dentro de Resources al prefab (ej: \"Prefabs/PushHitbox\")")]
+    [SerializeField] private string pushHitboxPrefabPath = "Prefabs/PushHitbox";
+    [SerializeField] private float pushOffset = 1f;
+    [SerializeField] private float pushCooldown = 0.6f;
+    private float lastPushTime = -999f;
 
     void Start()
     {
@@ -25,16 +39,6 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         rb = GetComponent<Rigidbody2D>();
         lava = FindObjectOfType<LavaRise>();
     }
-
-    private float horizontal;
-    private float lastHorizontal = 1f; // direcciÛn mirando (1 derecha, -1 izquierda)
-
-    [Header("EmpujÛn (networked)")]
-    [Tooltip("Ruta dentro de Resources al prefab (ej: \"Prefabs/PushHitbox\")")]
-    [SerializeField] private string pushHitboxPrefabPath = "Prefabs/PushHitbox";
-    [SerializeField] private float pushOffset = 1f;
-    [SerializeField] private float pushCooldown = 0.6f;
-    private float lastPushTime = -999f;
 
     void Update()
     {
@@ -44,18 +48,14 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         if (Mathf.Abs(horizontal) > 0.01f) lastHorizontal = Mathf.Sign(horizontal);
 
         if (lava == null)
-        {
             lava = FindObjectOfType<LavaRise>();
-        }
 
         bool lavaStarted = (lava != null && lava.IsRising);
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && lavaStarted)
-        {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        }
 
-        // EmpujÛn: E
+        // Empuj√≥n con tecla E
         if (Input.GetKeyDown(KeyCode.E) && Time.time - lastPushTime >= pushCooldown)
         {
             DoPush();
@@ -67,10 +67,15 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine) return;
 
+        // Si estamos en knockback, NO pisamos la velocidad. Dejamos actuar la f√≠sica.
+        bool inKnockback = Time.time < knockbackUntil;
+        if (inKnockback) return;
+
+        // Movimiento normal
         rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
     }
 
-    // ui arriba del jugador 
+    // UI arriba del jugador
     void LateUpdate()
     {
         if (nicknameUI != null)
@@ -83,49 +88,49 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     private void DoPush()
     {
-       
-
-        // Calcula spawn seg˙n la ˙ltima direcciÛn
         float dir = lastHorizontal >= 0 ? 1f : -1f;
         Vector3 spawnPos = transform.position + new Vector3(pushOffset * dir, 0f, 0f);
 
-        // Instanciar en red (todos ver·n la hitbox)
-        PhotonNetwork.Instantiate(pushHitboxPrefabPath, spawnPos, Quaternion.identity);
+        // Instanciar en red
+        GameObject go = PhotonNetwork.Instantiate(pushHitboxPrefabPath, spawnPos, Quaternion.identity);
+
+        // MUY IMPORTANTE: setear escala para que la PushHitbox lea la direcci√≥n (Mathf.Sign(localScale.x))
+        go.transform.localScale = new Vector3(dir, 1f, 1f);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
-        {
             isGrounded = true;
-        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
-        {
             isGrounded = false;
-        }
     }
 
     [PunRPC]
     public void RPC_SetNickname(string nickname)
     {
-        nicknameUI.text = nickname;
+        if (nicknameUI != null) nicknameUI.text = nickname;
     }
 
     [PunRPC]
     public void RPC_ApplyPush(float vx, float vy)
     {
+        // Solo el due√±o aplica la fuerza localmente
         if (!photonView.IsMine) return;
 
-        Debug.Log($"RecibÌ push: {vx}, {vy}");
-
         if (rb == null) rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.AddForce(new Vector2(vx, vy), ForceMode2D.Impulse);
-        }
+
+        // (Opcional) Cancelar el input horizontal actual para que el knockback se note m√°s
+        rb.velocity = new Vector2(0f, rb.velocity.y);
+
+        // Aplicar impulso y abrir ventana de knockback
+        rb.AddForce(new Vector2(vx, vy), ForceMode2D.Impulse);
+        knockbackUntil = Time.time + knockbackTime;
+
+        Debug.Log($"Recib√≠ push: {vx}, {vy}. Knockback hasta: {knockbackUntil}");
     }
 }
