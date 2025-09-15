@@ -49,8 +49,8 @@ public class MenuPun : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.SendRate = 30;
-        PhotonNetwork.SerializationRate = 20;
+        PhotonNetwork.SendRate = 40;
+        PhotonNetwork.SerializationRate = 30;
         Debug.Log(nickname + " conectado al master");
 
         LoadingScreen.LoadScene(gameSceneName);

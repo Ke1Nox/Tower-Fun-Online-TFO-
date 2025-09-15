@@ -52,10 +52,11 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
         bool lavaStarted = (lava != null && lava.IsRising);
 
+        //impedir saltar jugador antes que inicie la partida
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && lavaStarted)
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
-       
+       //push e 
         if (Input.GetKeyDown(KeyCode.E) && Time.time - lastPushTime >= pushCooldown)
         {
             DoPush();
@@ -75,7 +76,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
     }
 
-    // UI arriba del jugador
+    // UI arriba del jugador (no rota ahora)
     void LateUpdate()
     {
         if (nicknameUI != null)
@@ -88,6 +89,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     private void DoPush()
     {
+        //para donde mira el player
         float dir = lastHorizontal >= 0 ? 1f : -1f;
         Vector3 spawnPos = transform.position + new Vector3(pushOffset * dir, 0f, 0f);
 
@@ -98,6 +100,8 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         go.transform.localScale = new Vector3(dir, 1f, 1f);
     }
 
+
+    //verificador de piso
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
@@ -116,6 +120,8 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         if (nicknameUI != null) nicknameUI.text = nickname;
     }
 
+
+    //empuje
     [PunRPC]
     public void RPC_ApplyPush(float vx, float vy)
     {
@@ -131,6 +137,6 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         rb.AddForce(new Vector2(vx, vy), ForceMode2D.Impulse);
         knockbackUntil = Time.time + knockbackTime;
 
-        Debug.Log($"Recibí push: {vx}, {vy}. Knockback hasta: {knockbackUntil}");
+       
     }
 }
