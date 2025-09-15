@@ -42,26 +42,22 @@ public class PushAbility2D : MonoBehaviourPun
 
         Vector2 center = (Vector2)transform.position + dir * boxDistance;
 
-        // LOG: dibujar una rayita para ver dirección
-        Debug.DrawLine(transform.position, center, Color.cyan, 0.5f);
-
         Collider2D[] hits = Physics2D.OverlapBoxAll(center, boxHalfExtents * 2f, 0f, playerMask);
-        Debug.Log($"[Push] Overlap center={center} size={boxHalfExtents * 2f} mask={(int)playerMask} hits={hits.Length}");
 
         foreach (var col in hits)
         {
             PhotonView otherPv = col.attachedRigidbody ? col.attachedRigidbody.GetComponentInParent<PhotonView>()
                                                        : col.GetComponentInParent<PhotonView>();
-            if (otherPv == null) { Debug.Log("[Push] hit sin PhotonView"); continue; }
+            if (otherPv == null) continue;
+            if (otherPv.ViewID == photonView.ViewID) continue; // evitar empujarte vos mismo
 
-            if (otherPv.ViewID == photonView.ViewID) { Debug.Log("[Push] me filtré a mí mismo"); continue; }
+            // knockback simplificado
+            Vector2 knock = new Vector2(dir.x * pushForce, verticalLift);
 
-            Vector2 knock = (dir + Vector2.up * verticalLift).normalized * pushForce;
-
-            Debug.Log($"[Push] Enviando RPC a {otherPv.Owner?.NickName ?? "owner?"} viewID={otherPv.ViewID} knock={knock}");
             otherPv.RPC(nameof(KnockbackReceiver2D.ApplyKnockback2D), otherPv.Owner, knock.x, knock.y);
         }
     }
+
 
     void OnDrawGizmosSelected()
     {

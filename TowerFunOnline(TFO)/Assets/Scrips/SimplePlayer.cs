@@ -17,41 +17,45 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     private Rigidbody2D rb;
     private bool isGrounded;
 
+    
     private LavaRise lava;
-
-    // >>> añadido: última dirección de movimiento horizontal
-    public Vector2 LastMoveDir { get; private set; } = Vector2.right;
-    private float horizontal;
 
     void Start()
     {
         photonView = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody2D>();
+
+       
         lava = FindObjectOfType<LavaRise>();
     }
+
+    private float horizontal;
 
     void Update()
     {
         if (!photonView.IsMine) return;
 
+        
         horizontal = Input.GetAxis("Horizontal");
 
-        // >>> actualizado: recordar última dirección si hay input
-        if (Mathf.Abs(horizontal) > 0.01f)
-            LastMoveDir = new Vector2(Mathf.Sign(horizontal), 0f);
-
         if (lava == null)
+        {
             lava = FindObjectOfType<LavaRise>();
+        }
 
         bool lavaStarted = (lava != null && lava.IsRising);
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && lavaStarted)
+        {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
     }
 
     void FixedUpdate()
     {
         if (!photonView.IsMine) return;
+
+        
         rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
     }
 
@@ -69,13 +73,17 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
+        {
             isGrounded = true;
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (((1 << collision.gameObject.layer) & groundMask) != 0)
+        {
             isGrounded = false;
+        }
     }
 
     [PunRPC]

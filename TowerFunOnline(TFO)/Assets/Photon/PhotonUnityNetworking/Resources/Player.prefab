@@ -253,12 +253,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pushKey: 101
-  boxHalfExtents: {x: 1.2, y: 0.8}
-  boxDistance: 1.2
+  boxHalfExtents: {x: 2.5, y: 1.2}
+  boxDistance: 1.6
   playerMask:
     serializedVersion: 2
-    m_Bits: 64
-  pushForce: 8
+    m_Bits: 2147483647
+  pushForce: 12
   verticalLift: 0
   cooldown: 0.35
 --- !u!1 &1350508814745868332
