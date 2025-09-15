@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -38,10 +38,11 @@ public class MenuPun : MonoBehaviourPunCallbacks
     public void HandleConnectButton()
     {
         PlayerPrefs.SetString(nicknameKey, nickname);
-
         PhotonNetwork.NickName = nickname.ToUpper();
         Debug.Log(nickname + " intenta conectarse...");
-        PhotonNetwork.ConnectUsingSettings();
+
+        // 🔹 Mostrar la LoadingScene en modo "Conectando"
+        LoadingScreen.ShowConnecting(gameSceneName);
 
         connectionButton.interactable = false;
     }
