@@ -4,10 +4,10 @@ using Photon.Pun;
 public class PushHitbox : MonoBehaviourPun
 {
     [Tooltip("Fuerza del empujón (se pasa por RPC en unidades de impulso)")]
-    public float pushForce = 8f;
+    public float pushForce = 20f;
 
     [Tooltip("Cuánto dura la hitbox en segundos")]
-    public float lifeTime = 0.15f;
+    public float lifeTime = 0.5f;
 
     private void Start()
     {

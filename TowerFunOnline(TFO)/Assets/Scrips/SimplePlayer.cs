@@ -83,12 +83,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     private void DoPush()
     {
-        // Asegurar que exista el prefab en Resources/...
-        if (string.IsNullOrEmpty(pushHitboxPrefabPath))
-        {
-            Debug.LogWarning("PushHitbox prefab path vacío. Pon el prefab en Resources y setea pushHitboxPrefabPath.");
-            return;
-        }
+       
 
         // Calcula spawn según la última dirección
         float dir = lastHorizontal >= 0 ? 1f : -1f;
