@@ -39,10 +39,7 @@ public class RoomPropertiesListener : MonoBehaviourPunCallbacks
             {
                 HandleGameEnded((int)winnerObj);
             }
-            else
-            {
-                Debug.LogWarning("RoomPropertiesListener: GameEnded true pero no hay Winner en propiedades.");
-            }
+           
         }
     }
 
@@ -53,7 +50,7 @@ public class RoomPropertiesListener : MonoBehaviourPunCallbacks
 
         Debug.Log($"RoomPropertiesListener: Game ended. Winner actor: {winnerActorNumber}. Local actor: {localActor}. IAmWinner: {iAmWinner}");
 
-        
+        //cargar escenas 
         if (iAmWinner)
         {
             SceneManager.LoadScene(victorySceneName);

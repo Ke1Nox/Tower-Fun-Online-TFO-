@@ -14,7 +14,7 @@ public class LavaRise : MonoBehaviour
         private set { isRising = value; }
     }
 
-    [Header("Escena al morir por lava (nombre en Build Settings)")]
+    [Header("Escena al morir por ")]
     public string loseSceneName = "LoseScene";
 
     void Update()

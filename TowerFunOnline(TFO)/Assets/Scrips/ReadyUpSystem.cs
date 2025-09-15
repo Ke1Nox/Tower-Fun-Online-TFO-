@@ -29,6 +29,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
 
     void Update()
     {
+        //apretar enter para iniciar
         if (PhotonNetwork.InRoom && Input.GetKeyDown(KeyCode.Return))
         {
             if (!readyPlayers.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
@@ -38,6 +39,8 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         }
     }
 
+
+    //arrancar partida
     [PunRPC]
     void RPC_SetPlayerReady(int actorNumber, string nickname)
     {
@@ -57,6 +60,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
         }
     }
 
+    //arranca el juego 
     [PunRPC]
     void RPC_StartGame()
     {
@@ -67,7 +71,7 @@ public class ReadyUpSystem : MonoBehaviourPunCallbacks
             lava.StartRising();
         }
     }
-
+    //identacion de texto 
     private void ShowLog(string message)
     {
         Debug.Log(message);

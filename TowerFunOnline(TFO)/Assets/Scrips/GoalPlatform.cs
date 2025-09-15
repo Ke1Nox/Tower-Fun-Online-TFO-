@@ -23,7 +23,7 @@ public class GoalPlatform : MonoBehaviour
         object existing;
         if (currentRoom.CustomProperties.TryGetValue(GAME_ENDED_KEY, out existing) && (bool)existing == true)
         {
-            
+            //fin
             return;
         }
 
