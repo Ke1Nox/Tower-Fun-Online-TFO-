@@ -16,6 +16,8 @@ public class KnockbackReceiver2D : MonoBehaviourPun
         // Solo el dueño mueve su propio personaje
         if (!photonView.IsMine) return;
 
+        Debug.Log($"[Knockback] Recibido de {info.Sender?.NickName ?? "?"}: ({x},{y})");
+
         Vector2 impulse = new Vector2(x, y);
 
         // Impulso instantáneo independiente de masa
