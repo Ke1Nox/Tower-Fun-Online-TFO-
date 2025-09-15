@@ -14,8 +14,7 @@ public class RoomPropertiesListener : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        // Si las propiedades ya están establecidas antes de que este script arranque,
-        // compruébalas ahora
+        
         if (PhotonNetwork.InRoom)
         {
             object endedObj;
@@ -54,7 +53,7 @@ public class RoomPropertiesListener : MonoBehaviourPunCallbacks
 
         Debug.Log($"RoomPropertiesListener: Game ended. Winner actor: {winnerActorNumber}. Local actor: {localActor}. IAmWinner: {iAmWinner}");
 
-        // Cargar la escena correspondiente para el jugador local
+        
         if (iAmWinner)
         {
             SceneManager.LoadScene(victorySceneName);
