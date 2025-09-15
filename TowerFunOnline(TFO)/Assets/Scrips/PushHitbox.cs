@@ -27,7 +27,8 @@ public class PushHitbox : MonoBehaviourPun
         if (otherPV.OwnerActorNr == photonView.OwnerActorNr) return;
 
         // Dirección desde la hitbox hacia el jugador alcanzado
-        Vector2 direction = (other.transform.position - transform.position).normalized;
+        Vector2 direction = new Vector2(Mathf.Sign(transform.localScale.x), 0f);
+
 
         float vx = direction.x * pushForce;
         float vy = direction.y * pushForce;

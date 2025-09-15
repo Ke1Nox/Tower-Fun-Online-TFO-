@@ -115,12 +115,12 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         nicknameUI.text = nickname;
     }
 
-    // Este RPC se llama en el cliente "dueño" del jugador alcanzado.
     [PunRPC]
     public void RPC_ApplyPush(float vx, float vy)
     {
-        // Solo el dueño del PhotonView debe aplicar la fuerza localmente
         if (!photonView.IsMine) return;
+
+        Debug.Log($"Recibí push: {vx}, {vy}");
 
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (rb != null)
