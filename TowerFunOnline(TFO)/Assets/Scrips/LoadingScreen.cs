@@ -2,79 +2,94 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class LoadingScreen : MonoBehaviourPunCallbacks
 {
     [SerializeField] private Slider progressBar;
     [SerializeField] private TextMeshProUGUI progressText;
 
-    private static string targetScene;
+    [Header("Asigná los 3 niveles (nombres EXACTOS según Build Settings)")]
+    public string level1;
+    public string level2;
+    public string level3;
+
     private static bool isConnecting = false;
 
-    public static void ShowConnecting(string nextScene)
+    // Llamar desde MenuPun: LoadingScreen.ShowConnecting();
+    public static void ShowConnecting()
     {
-        targetScene = nextScene;
         isConnecting = true;
-        SceneManager.LoadScene("LoadingScene", LoadSceneMode.Additive);
-    }
-
-    public static void LoadScene(string sceneName)
-    {
-        targetScene = sceneName;
-        isConnecting = false;
         SceneManager.LoadScene("LoadingScene", LoadSceneMode.Additive);
     }
 
     private void Start()
     {
+        // Evitar múltiples EventSystems si la LoadingScene se añadió encima
+        var systems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
+        for (int i = 1; i < systems.Length; i++)
+        {
+            Destroy(systems[i].gameObject);
+        }
+
         if (isConnecting)
         {
             if (progressText != null) progressText.text = "Conectando...";
             if (progressBar != null) progressBar.gameObject.SetActive(false);
 
+            // Importante: sincronizar escenas por Photon
+            PhotonNetwork.AutomaticallySyncScene = true;
+
+            // Conectar al Master (LoadingScreen controla la conexión)
             PhotonNetwork.ConnectUsingSettings();
-        }
-        else
-        {
-            StartCoroutine(LoadAsync());
         }
     }
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Conectado a Photon Master");
-      
-        StartCoroutine(LoadAsync());
+        Debug.Log("LoadingScreen: Conectado a Photon Master -> intentando JoinRandomRoom()");
+        // Intentamos unirnos a una sala existente
+        PhotonNetwork.JoinRandomRoom();
     }
 
-    private IEnumerator LoadAsync()
+    public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        if (progressBar != null) progressBar.gameObject.SetActive(true);
+        Debug.Log("LoadingScreen: No se pudo unirse a una sala (creando una). Razón: " + message);
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 4; // modificá según necesidad
+        PhotonNetwork.CreateRoom(null, roomOptions); // nombre null = Photon crea uno aleatorio
+    }
 
-        AsyncOperation op = SceneManager.LoadSceneAsync(targetScene, LoadSceneMode.Single);
-        op.allowSceneActivation = false;
+    public override void OnJoinedRoom()
+    {
+        Debug.Log("LoadingScreen: Se unió a la sala: " + PhotonNetwork.CurrentRoom.Name);
 
-        while (!op.isDone)
+        if (PhotonNetwork.IsMasterClient)
         {
-            float progress = Mathf.Clamp01(op.progress / 0.9f);
+            // El Master decide el nivel aleatorio entre los 3
+            int randomIndex = Random.Range(0, 3);
+            string selectedScene = (randomIndex == 0) ? level1 : (randomIndex == 1) ? level2 : level3;
 
-            if (progressBar != null) progressBar.value = progress;
-            if (progressText != null) progressText.text = (progress * 100f).ToString("F0") + "%";
+            Debug.Log("MasterClient cargará la escena: " + selectedScene);
+            if (progressText != null) progressText.text = "Cargando nivel...";
+            if (progressBar != null) { progressBar.gameObject.SetActive(true); progressBar.value = 0f; }
 
-            if (op.progress >= 0.9f)
-            {
-                if (progressBar != null) progressBar.value = 1f;
-                if (progressText != null) progressText.text = "100%";
-
-                op.allowSceneActivation = true;
-
-                yield return null;
-                SceneManager.UnloadSceneAsync("LoadingScene");
-            }
-
-            yield return null;
+            // Carga sincronizada para TODOS los jugadores en la sala
+            PhotonNetwork.LoadLevel(selectedScene);
         }
+        else
+        {
+            // Clientes esperan que el host cargue la escena
+            if (progressText != null) progressText.text = "Esperando al host...";
+            if (progressBar != null) progressBar.gameObject.SetActive(true);
+        }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.LogWarning("LoadingScreen: Desconectado de Photon: " + cause);
+        // Opcional: volver a menú, mostrar error, o descargar la loading scene
+        SceneManager.UnloadSceneAsync("LoadingScene");
     }
 }

@@ -42,27 +42,15 @@ public class MenuPun : MonoBehaviourPunCallbacks
 
     public void HandleConnectButton()
     {
-        // Elegir aleatoriamente uno de los 3 niveles
-        int randomIndex = Random.Range(0, 3);
-        if (randomIndex == 0) gameSceneName = level1;
-        else if (randomIndex == 1) gameSceneName = level2;
-        else gameSceneName = level3;
-
         PlayerPrefs.SetString(nicknameKey, nickname);
         PhotonNetwork.NickName = nickname.ToUpper();
-        Debug.Log(nickname + " intenta conectarse a " + gameSceneName + "...");
+        Debug.Log(nickname + " intenta conectarse...");
 
-        LoadingScreen.ShowConnecting(gameSceneName);
+        
+        LoadingScreen.ShowConnecting();
 
         connectionButton.interactable = false;
     }
 
-    public override void OnConnectedToMaster()
-    {
-        PhotonNetwork.SendRate = 50;
-        PhotonNetwork.SerializationRate = 40;
-        Debug.Log(nickname + " conectado al master");
 
-        LoadingScreen.LoadScene(gameSceneName);
-    }
 }
