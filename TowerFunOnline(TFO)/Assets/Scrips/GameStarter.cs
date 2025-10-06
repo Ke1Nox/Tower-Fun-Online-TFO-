@@ -7,20 +7,36 @@ using Photon.Realtime;
 public class GameStarter : MonoBehaviourPunCallbacks
 {
     [Header("Prefabs & Spawns")]
-    [SerializeField] private GameObject playerPrefab;           
-    [SerializeField] private Transform playerSpawn;             
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Transform playerSpawn;
     [SerializeField] private List<Transform> playerSpawnPositions = new List<Transform>();
 
     private int currentSpawnIndex = 0;
 
     void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            Debug.Log("Conectando a Photon...");
+            PhotonNetwork.ConnectUsingSettings();
+        }
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        Debug.Log("Conectado al servidor Master. Entrando al lobby...");
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("Unido al lobby. Intentando unirse o crear una sala...");
         PhotonNetwork.JoinRandomOrCreateRoom();
     }
 
     public override void OnJoinedRoom()
     {
-        
+        Debug.Log("Unido a una sala. Spawneando jugador...");
         StartCoroutine(WaitForSpawnPoint());
     }
 
@@ -28,7 +44,6 @@ public class GameStarter : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsMasterClient)
         {
-            
             yield return new WaitUntil(() => currentSpawnIndex > -1);
         }
         else
@@ -37,16 +52,13 @@ public class GameStarter : MonoBehaviourPunCallbacks
         }
 
         CreateAndSetUpPlayerInstance();
-        //UpdateSpawnIndexForAll();
     }
 
-    // Spawner:
     private void CreateAndSetUpPlayerInstance()
     {
         Transform spawn = GetPlayerSpawnPosition();
         if (spawn == null) spawn = playerSpawn;
 
-        // Distancias entre spawns 
         int playerIndex = PhotonNetwork.CurrentRoom.PlayerCount - 1;
         Vector3 spawnPosition = spawn.position + new Vector3(playerIndex * 2.5f, 0, 0);
 
@@ -68,16 +80,9 @@ public class GameStarter : MonoBehaviourPunCallbacks
         if (playerSpawnPositions == null || playerSpawnPositions.Count == 0)
             return playerSpawn;
 
-        
         int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
         return playerSpawnPositions[safeIndex];
     }
-
-    //private void UpdateSpawnIndexForAll()
-    //{
-    //    currentSpawnIndex++;
-    //    GetComponent<PhotonView>().RPC(nameof(RPC_UpdateSpawnIndex), RpcTarget.AllBuffered, currentSpawnIndex);
-    //}
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
