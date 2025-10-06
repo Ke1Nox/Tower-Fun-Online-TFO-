@@ -1435,6 +1435,9 @@ MonoBehaviour:
   gameSceneName: Game
   inputField: {fileID: 1282023713}
   connectionButton: {fileID: 1097935227}
+  level1: Game
+  level2: Game1
+  level3: Game2
 --- !u!4 &1831177685
 Transform:
   m_ObjectHideFlags: 0

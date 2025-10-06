@@ -8,9 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class MenuPun : MonoBehaviourPunCallbacks
 {
-    public string gameSceneName;
+    public string gameSceneName; 
     public TMP_InputField inputField;
     public Button connectionButton;
+
+    
+    public string level1;
+    public string level2;
+    public string level3;
 
     private const string nicknameKey = "playerNickname";
     private string nickname;
@@ -37,11 +42,16 @@ public class MenuPun : MonoBehaviourPunCallbacks
 
     public void HandleConnectButton()
     {
+        // Elegir aleatoriamente uno de los 3 niveles
+        int randomIndex = Random.Range(0, 3);
+        if (randomIndex == 0) gameSceneName = level1;
+        else if (randomIndex == 1) gameSceneName = level2;
+        else gameSceneName = level3;
+
         PlayerPrefs.SetString(nicknameKey, nickname);
         PhotonNetwork.NickName = nickname.ToUpper();
-        Debug.Log(nickname + " intenta conectarse...");
+        Debug.Log(nickname + " intenta conectarse a " + gameSceneName + "...");
 
-        // 🔹 Mostrar la LoadingScene en modo "Conectando"
         LoadingScreen.ShowConnecting(gameSceneName);
 
         connectionButton.interactable = false;
