@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -10,7 +10,7 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
     [SerializeField] private Slider progressBar;
     [SerializeField] private TextMeshProUGUI progressText;
 
-    [Header("Asigná los 3 niveles (nombres EXACTOS según Build Settings)")]
+    [Header("AsignÃ¡ los 3 niveles (nombres EXACTOS segÃºn Build Settings)")]
     public string level1;
     public string level2;
     public string level3;
@@ -26,23 +26,27 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // Evitar múltiples EventSystems si la LoadingScene se añadió encima
+        // Evitar mÃºltiples EventSystems si la LoadingScene se aÃ±adiÃ³ encima
         var systems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
         for (int i = 1; i < systems.Length; i++)
-        {
             Destroy(systems[i].gameObject);
-        }
 
         if (isConnecting)
         {
             if (progressText != null) progressText.text = "Conectando...";
             if (progressBar != null) progressBar.gameObject.SetActive(false);
 
-            // Importante: sincronizar escenas por Photon
             PhotonNetwork.AutomaticallySyncScene = true;
 
-            // Conectar al Master (LoadingScreen controla la conexión)
-            PhotonNetwork.ConnectUsingSettings();
+            // ðŸ”¹ Evita reconectar si ya estÃ¡ conectado
+            if (!PhotonNetwork.IsConnected)
+            {
+                PhotonNetwork.ConnectUsingSettings();
+            }
+            else
+            {
+                OnConnectedToMaster(); // continuar flujo si ya estaba conectado
+            }
         }
     }
 
@@ -55,15 +59,15 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("LoadingScreen: No se pudo unirse a una sala (creando una). Razón: " + message);
+        Debug.Log("LoadingScreen: No se pudo unirse a una sala (creando una). RazÃ³n: " + message);
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 4; // modificá según necesidad
+        roomOptions.MaxPlayers = 4; // modificÃ¡ segÃºn necesidad
         PhotonNetwork.CreateRoom(null, roomOptions); // nombre null = Photon crea uno aleatorio
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("LoadingScreen: Se unió a la sala: " + PhotonNetwork.CurrentRoom.Name);
+        Debug.Log("LoadingScreen: Se uniÃ³ a la sala: " + PhotonNetwork.CurrentRoom.Name);
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -71,7 +75,7 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
             int randomIndex = Random.Range(0, 3);
             string selectedScene = (randomIndex == 0) ? level1 : (randomIndex == 1) ? level2 : level3;
 
-            Debug.Log("MasterClient cargará la escena: " + selectedScene);
+            Debug.Log("MasterClient cargarÃ¡ la escena: " + selectedScene);
             if (progressText != null) progressText.text = "Cargando nivel...";
             if (progressBar != null) { progressBar.gameObject.SetActive(true); progressBar.value = 0f; }
 
@@ -89,7 +93,7 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         Debug.LogWarning("LoadingScreen: Desconectado de Photon: " + cause);
-        // Opcional: volver a menú, mostrar error, o descargar la loading scene
+        // Opcional: volver a menÃº, mostrar error, o descargar la loading scene
         SceneManager.UnloadSceneAsync("LoadingScene");
     }
 }

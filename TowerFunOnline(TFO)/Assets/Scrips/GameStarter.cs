@@ -13,31 +13,18 @@ public class GameStarter : MonoBehaviourPunCallbacks
 
     private int currentSpawnIndex = 0;
 
-    void Start()
+    private void Start()
     {
-        if (!PhotonNetwork.IsConnected)
+        // Solo ejecuta si ya estamos en una sala
+        if (PhotonNetwork.InRoom)
         {
-            Debug.Log("Conectando a Photon...");
-            PhotonNetwork.ConnectUsingSettings();
+            Debug.Log("Estamos en sala. Spawneando jugador...");
+            StartCoroutine(WaitForSpawnPoint());
         }
-    }
-
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log("Conectado al servidor Master. Entrando al lobby...");
-        PhotonNetwork.JoinLobby();
-    }
-
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("Unido al lobby. Intentando unirse o crear una sala...");
-        PhotonNetwork.JoinRandomOrCreateRoom();
-    }
-
-    public override void OnJoinedRoom()
-    {
-        Debug.Log("Unido a una sala. Spawneando jugador...");
-        StartCoroutine(WaitForSpawnPoint());
+        else
+        {
+            Debug.LogWarning("GameStarter iniciado sin estar en una sala Photon.");
+        }
     }
 
     private IEnumerator WaitForSpawnPoint()
@@ -86,7 +73,7 @@ public class GameStarter : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Debug.Log($"Player {newPlayer.NickName} entered the room");
+        Debug.Log($"Jugador {newPlayer.NickName} entró a la sala");
     }
 
     [PunRPC]

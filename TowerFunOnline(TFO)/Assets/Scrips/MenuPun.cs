@@ -1,21 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Photon.Pun;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class MenuPun : MonoBehaviourPunCallbacks
 {
-    public string gameSceneName; 
     public TMP_InputField inputField;
     public Button connectionButton;
-
-    
-    public string level1;
-    public string level2;
-    public string level3;
 
     private const string nicknameKey = "playerNickname";
     private string nickname;
@@ -24,19 +15,12 @@ public class MenuPun : MonoBehaviourPunCallbacks
     {
         connectionButton.onClick.AddListener(HandleConnectButton);
         inputField.onValueChanged.AddListener(VerifyName);
+        connectionButton.interactable = false;
     }
 
     private void VerifyName(string newName)
     {
-        if (inputField.text.Length == 0)
-        {
-            connectionButton.interactable = false;
-        }
-
-        if (inputField.text.Length >= 1 && !connectionButton.interactable)
-        {
-            connectionButton.interactable = true;
-        }
+        connectionButton.interactable = newName.Length > 0;
         nickname = newName;
     }
 
@@ -44,13 +28,10 @@ public class MenuPun : MonoBehaviourPunCallbacks
     {
         PlayerPrefs.SetString(nicknameKey, nickname);
         PhotonNetwork.NickName = nickname.ToUpper();
-        Debug.Log(nickname + " intenta conectarse...");
 
-        
+        Debug.Log(nickname + " intenta conectarse...");
         LoadingScreen.ShowConnecting();
 
         connectionButton.interactable = false;
     }
-
-
 }
