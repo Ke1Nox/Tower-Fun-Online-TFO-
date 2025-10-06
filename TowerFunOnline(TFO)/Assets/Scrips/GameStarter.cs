@@ -1,84 +1,78 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 
 public class GameStarter : MonoBehaviourPunCallbacks
 {
     [Header("Prefabs & Spawns")]
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private string playerResourcePath = "Prefabs/Player"; //  usa ruta en Resources
     [SerializeField] private Transform playerSpawn;
-    [SerializeField] private List<Transform> playerSpawnPositions = new List<Transform>();
+    [SerializeField] private System.Collections.Generic.List<Transform> playerSpawnPositions = new System.Collections.Generic.List<Transform>();
 
+    private bool hasSpawned = false;
     private int currentSpawnIndex = 0;
 
     private void Start()
     {
-        // Solo ejecuta si ya estamos en una sala
         if (PhotonNetwork.InRoom)
         {
-            Debug.Log("Estamos en sala. Spawneando jugador...");
-            StartCoroutine(WaitForSpawnPoint());
+            Debug.Log($"[GameStarter] InRoom={PhotonNetwork.InRoom} ActorNumber={PhotonNetwork.LocalPlayer?.ActorNumber}");
+            StartCoroutine(WaitAndSpawn());
         }
         else
         {
-            Debug.LogWarning("GameStarter iniciado sin estar en una sala Photon.");
+            Debug.LogWarning("[GameStarter] Start sin estar en sala. Esperando OnJoinedRoom...");
         }
     }
 
-    private IEnumerator WaitForSpawnPoint()
+    public override void OnJoinedRoom()
     {
+        Debug.Log($"[GameStarter] OnJoinedRoom -> ActorNumber={PhotonNetwork.LocalPlayer?.ActorNumber}, PlayerCount={PhotonNetwork.CurrentRoom.PlayerCount}");
+        if (!hasSpawned) StartCoroutine(WaitAndSpawn());
+    }
+
+    private IEnumerator WaitAndSpawn()
+    {
+        // Si dependés de algún índice de spawn del Master
         if (!PhotonNetwork.IsMasterClient)
-        {
-            yield return new WaitUntil(() => currentSpawnIndex > -1);
-        }
-        else
-        {
-            currentSpawnIndex = 0;
-        }
+            yield return new WaitUntil(() => currentSpawnIndex >= 0);
 
         CreateAndSetUpPlayerInstance();
     }
 
     private void CreateAndSetUpPlayerInstance()
     {
-        Transform spawn = GetPlayerSpawnPosition();
-        if (spawn == null) spawn = playerSpawn;
+        if (hasSpawned) return;
 
-        int playerIndex = PhotonNetwork.CurrentRoom.PlayerCount - 1;
-        Vector3 spawnPosition = spawn.position + new Vector3(playerIndex * 2.5f, 0, 0);
+        Transform spawn = GetPlayerSpawnPosition() ?? playerSpawn;
+        Vector3 spawnPos = (spawn != null ? spawn.position : Vector3.zero);
 
-        GameObject player = PhotonNetwork.Instantiate(
-            playerPrefab.name,
-            spawnPosition,
-            spawn.rotation,
-            0);
+        // Opcional: separarlos un poco según el ActorNumber para evitar overlap
+        int offset = Mathf.Max(0, PhotonNetwork.LocalPlayer.ActorNumber - 1);
+        spawnPos += new Vector3(offset * 2.0f, 0f, 0f);
 
-        player.GetComponent<PhotonView>().RPC(
-            "RPC_SetNickname",
-            RpcTarget.AllBuffered,
-            PlayerPrefs.GetString("playerNickname", "Player")
-        );
+        // IMPORTANTE: usamos ruta en Resources (no el .name de la referencia)
+        GameObject player = PhotonNetwork.Instantiate(playerResourcePath, spawnPos, spawn != null ? spawn.rotation : Quaternion.identity, 0);
+
+        hasSpawned = true;
+
+        // Setear nickname (RPC ya existe en tu SimplePlayer)
+        var view = player.GetComponent<PhotonView>();
+        if (view != null)
+        {
+            string nick = PlayerPrefs.GetString("playerNickname", "PLAYER");
+            view.RPC("RPC_SetNickname", RpcTarget.AllBuffered, nick);
+        }
     }
 
     private Transform GetPlayerSpawnPosition()
     {
-        if (playerSpawnPositions == null || playerSpawnPositions.Count == 0)
-            return playerSpawn;
-
-        int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
-        return playerSpawnPositions[safeIndex];
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        Debug.Log($"Jugador {newPlayer.NickName} entró a la sala");
-    }
-
-    [PunRPC]
-    public void RPC_UpdateSpawnIndex(int newIndex)
-    {
-        currentSpawnIndex = newIndex;
+        if (playerSpawnPositions != null && playerSpawnPositions.Count > 0)
+        {
+            int safeIndex = Mathf.Abs(currentSpawnIndex) % playerSpawnPositions.Count;
+            return playerSpawnPositions[safeIndex];
+        }
+        return playerSpawn;
     }
 }
