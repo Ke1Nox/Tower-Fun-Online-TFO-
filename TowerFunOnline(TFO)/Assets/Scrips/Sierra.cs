@@ -4,8 +4,8 @@ using Photon.Pun;
 public class Sierra : MonoBehaviour
 {
     [Header("Movimiento")]
-    [SerializeField] private float moveSpeed = 3f;     // Velocidad de movimiento
-    [SerializeField] private float moveDistance = 5f;  // Distancia total entre extremos
+    [SerializeField] private float moveSpeed = 3f;     
+    [SerializeField] private float moveDistance = 5f;  
 
     private Vector3 startPos;
     private bool movingRight = true;
@@ -25,7 +25,7 @@ public class Sierra : MonoBehaviour
 
     private void MoveSaw()
     {
-        // Mueve la sierra de un lado a otro
+        
         if (movingRight)
         {
             transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
