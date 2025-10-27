@@ -10,14 +10,14 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
     [SerializeField] private Slider progressBar;
     [SerializeField] private TextMeshProUGUI progressText;
 
-    [Header("Asigná los 3 niveles (nombres EXACTOS según Build Settings)")]
+
     public string level1;
     public string level2;
     public string level3;
 
     private static bool isConnecting = false;
 
-    // Llamar desde MenuPun: LoadingScreen.ShowConnecting();
+    //  LoadingScreen.ShowConnecting();
     public static void ShowConnecting()
     {
         isConnecting = true;
@@ -26,7 +26,6 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // Evitar múltiples EventSystems si la LoadingScene se añadió encima
         var systems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
         for (int i = 1; i < systems.Length; i++)
             Destroy(systems[i].gameObject);
@@ -38,14 +37,14 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
 
             PhotonNetwork.AutomaticallySyncScene = true;
 
-            // 🔹 Evita reconectar si ya está conectado
+            //  Evita reconectar si ya está conectado
             if (!PhotonNetwork.IsConnected)
             {
                 PhotonNetwork.ConnectUsingSettings();
             }
             else
             {
-                OnConnectedToMaster(); // continuar flujo si ya estaba conectado
+                OnConnectedToMaster(); 
             }
         }
     }
@@ -53,7 +52,7 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("LoadingScreen: Conectado a Photon Master -> intentando JoinRandomRoom()");
-        // Intentamos unirnos a una sala existente
+        //  unirnse a una sala existente
         PhotonNetwork.JoinRandomRoom();
     }
 
@@ -61,7 +60,7 @@ public class LoadingScreen : MonoBehaviourPunCallbacks
     {
         Debug.Log("LoadingScreen: No se pudo unirse a una sala (creando una). Razón: " + message);
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 4; // modificá según necesidad
+        roomOptions.MaxPlayers = 4; 
         PhotonNetwork.CreateRoom(null, roomOptions); // nombre null = Photon crea uno aleatorio
     }
 

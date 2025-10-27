@@ -25,12 +25,16 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     private float horizontal;
     private float lastHorizontal = 1f; // 1 derecha, -1 izquierda
+    private float vertical;
+    private float lastVertical = -1f;
 
     [Header("Empujón")]
     [Tooltip("Ruta dentro de Resources al prefab (ej: \"Prefabs/PushHitbox\")")]
     [SerializeField] private string pushHitboxPrefabPath = "Prefabs/PushHitbox";
     [SerializeField] private float pushOffset = 1f;
     [SerializeField] private float pushCooldown = 0.6f;
+
+    static public bool isdead = false;
     private float lastPushTime = -999f;
 
     void Start()
@@ -42,10 +46,17 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     void Update()
     {
+        //Moviminetos
         if (!photonView.IsMine) return;
-
-        horizontal = Input.GetAxis("Horizontal");
+        
+            horizontal = Input.GetAxis("Horizontal");
         if (Mathf.Abs(horizontal) > 0.01f) lastHorizontal = Mathf.Sign(horizontal);
+        
+           
+            vertical = Input.GetAxis("Vertical");
+            if (Mathf.Abs(vertical) < 0.01f) lastVertical = Mathf.Sign(vertical);
+        
+
 
         if (lava == null)
             lava = FindObjectOfType<LavaRise>();
@@ -68,12 +79,19 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine) return;
 
-        // NO pisamos la velocidad actua la física.
         bool inKnockback = Time.time < knockbackUntil;
         if (inKnockback) return;
 
-        // Movimiento normal
-        rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+        if (CompareTag("Dead"))
+        {
+            // Movimiento vertical cuando está muerto
+            rb.velocity = new Vector2(rb.velocity.x, vertical * moveSpeed);
+        }
+        else
+        {
+            // Movimiento horizontal normal
+            rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+        }
     }
 
     // UI arriba del jugador (no rota ahora)
@@ -133,7 +151,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
        
         rb.velocity = new Vector2(0f, rb.velocity.y);
 
-       
+
         rb.AddForce(new Vector2(vx, vy), ForceMode2D.Impulse);
         knockbackUntil = Time.time + knockbackTime;
 

@@ -36,7 +36,6 @@ public class LavaRise : MonoBehaviour
         if (view != null && view.IsMine)
         {
             
-            Debug.Log("LavaRise: Jugador local toco la lava. Cargando LoseScene...");
             PhotonNetwork.Destroy(other.gameObject);
             UnityEngine.SceneManagement.SceneManager.LoadScene(loseSceneName);
         }
