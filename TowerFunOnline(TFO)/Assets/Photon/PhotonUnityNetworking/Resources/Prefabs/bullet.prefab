@@ -161,4 +161,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   lifeTime: 4
-  loseSceneName: LoseScene
