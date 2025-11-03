@@ -19,6 +19,7 @@ public class Bullet : MonoBehaviourPun
 
     void Update()
     {
+        if (!photonView.IsMine) return; // solo el dueño la mueve
         transform.Translate(direction * speed * Time.deltaTime);
     }
 
