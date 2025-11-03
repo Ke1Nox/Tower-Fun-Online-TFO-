@@ -31,19 +31,22 @@ public class TurretAI : MonoBehaviourPun
 
     GameObject FindClosestPlayer()
     {
-        var players = GameObject.FindGameObjectsWithTag("Player");
-        if (players.Length == 0) return null;
+        SimplePlayer[] players = FindObjectsOfType<SimplePlayer>();
 
         GameObject closest = null;
         float minDist = Mathf.Infinity;
 
         foreach (var p in players)
         {
+            if (p.CompareTag("Dead")) continue; // ignorar muertos
+            if (p.GetComponent<PhotonView>() == null) continue; // seguridad
+            if (!p.gameObject.activeInHierarchy) continue;
+
             float d = Vector2.Distance(transform.position, p.transform.position);
             if (d < minDist)
             {
                 minDist = d;
-                closest = p;
+                closest = p.gameObject;
             }
         }
 
