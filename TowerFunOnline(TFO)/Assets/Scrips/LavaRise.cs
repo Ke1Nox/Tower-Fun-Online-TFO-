@@ -32,16 +32,14 @@ public class LavaRise : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        PhotonView view = other.GetComponent<PhotonView>();
-        if (view != null && view.IsMine)
-        {
-            
+        var pv = other.GetComponent<PhotonView>();
+        if (pv == null) return;
+
+        // Marca Eliminated (no ghost)
+        PlayerPropsUtil.SetState(pv.Owner, PlayerState.Eliminated);
+
+        if (pv.IsMine)
             PhotonNetwork.Destroy(other.gameObject);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(loseSceneName);
-        }
-        else
-        {
-            
-        }
+        // No cargues Lose aquí. El fin lo resuelve el Master.
     }
 }

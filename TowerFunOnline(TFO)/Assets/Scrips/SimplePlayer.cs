@@ -17,7 +17,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [SerializeField] private float knockbackTime = 0.25f;
     private float knockbackUntil = -1f;
 
-    private PhotonView photonView;
+    
     private Rigidbody2D rb;
     private bool isGrounded;
 
@@ -46,7 +46,7 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        photonView = GetComponent<PhotonView>();
+       
         rb = GetComponent<Rigidbody2D>();
         lava = FindObjectOfType<LavaRise>();
     }

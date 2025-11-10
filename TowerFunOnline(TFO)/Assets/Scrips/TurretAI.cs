@@ -13,10 +13,10 @@ public class TurretAI : MonoBehaviourPun
 
     void Update()
     {
-       
+        // Solo el Master controla las torretas (sincroniza disparos)
         if (!PhotonNetwork.IsMasterClient) return;
 
-        GameObject target = FindClosestPlayer();
+        GameObject target = FindClosestAlivePlayer();
         if (target == null) return;
 
         Vector2 dir = (target.transform.position - transform.position);
@@ -29,17 +29,26 @@ public class TurretAI : MonoBehaviourPun
         }
     }
 
-    GameObject FindClosestPlayer()
+    /// <summary>
+    /// Busca el jugador vivo más cercano (ignora fantasmas y eliminados)
+    /// </summary>
+    GameObject FindClosestAlivePlayer()
     {
         SimplePlayer[] players = FindObjectsOfType<SimplePlayer>();
-
         GameObject closest = null;
         float minDist = Mathf.Infinity;
 
         foreach (var p in players)
         {
-            if (p.CompareTag("Dead")) continue; // ignorar muertos
-            if (p.GetComponent<PhotonView>() == null) continue; // seguridad
+            if (p == null) continue;
+            var view = p.GetComponent<PhotonView>();
+            if (view == null || view.Owner == null) continue;
+
+            // Ignorar jugadores fantasmas o eliminados
+            var state = PlayerPropsUtil.GetState(view.Owner);
+            if (state != PlayerState.Alive) continue;
+
+            // Ignorar si está desactivado
             if (!p.gameObject.activeInHierarchy) continue;
 
             float d = Vector2.Distance(transform.position, p.transform.position);
@@ -53,6 +62,9 @@ public class TurretAI : MonoBehaviourPun
         return closest;
     }
 
+    /// <summary>
+    /// Instancia una bala y le pasa la dirección del disparo
+    /// </summary>
     void Shoot(Vector2 direction)
     {
         GameObject bullet = PhotonNetwork.Instantiate(bulletPrefabPath, transform.position, Quaternion.identity);

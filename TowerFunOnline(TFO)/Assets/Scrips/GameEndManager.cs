@@ -1,56 +1,134 @@
-using UnityEngine;
-using Photon.Pun;
 using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Playables;
 
-public class GameEndManager : MonoBehaviour
+public class GameEndManager : MonoBehaviourPunCallbacks
 {
-    public static GameEndManager Instance;
+    [SerializeField] private bool log = true;
+    [SerializeField] private int minPlayersToWin = 2; // no declarar ganador si la ronda empezó con menos
 
-    private const string GAME_ENDED_KEY = "GameEnded";
-    private const string WINNER_KEY = "Winner";
+    private bool ended;
+    private bool roundActive;
+    private int startCount;
 
-    void Awake()
+    void Start()
     {
-        Instance = this;
+        ReadRoundProps(PhotonNetwork.InRoom ? PhotonNetwork.CurrentRoom.CustomProperties : null);
+        TryResolveEnd("Start");
     }
 
-    public static void MasterCheckForWinner()
+    void Update()
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        if (PhotonNetwork.CurrentRoom == null) return;
+        if (!ended && PhotonNetwork.IsMasterClient) TryResolveEnd("Update");
+    }
 
-        // Ya terminó?
-        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(GAME_ENDED_KEY, out object endedObj) &&
-            endedObj is bool ended && ended) return;
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        ReadRoundProps(PhotonNetwork.CurrentRoom.CustomProperties);
+        if (PhotonNetwork.IsMasterClient && !ended) TryResolveEnd("Props");
+    }
 
-        SimplePlayer[] players = FindObjectsOfType<SimplePlayer>();
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (PhotonNetwork.IsMasterClient && !ended) TryResolveEnd("PlayerProps");
+    }
 
-        int aliveCount = 0;
-        Player lastAliveOwner = null;
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient && !ended) TryResolveEnd("PlayerLeft");
+    }
 
-        foreach (var p in players)
+    private void ReadRoundProps(Hashtable snap)
+    {
+        roundActive = ReadBool(MatchProps.ROUND_ACTIVE, snap);
+        startCount = ReadInt(MatchProps.START_COUNT, snap);
+    }
+
+    private void TryResolveEnd(string from)
+    {
+        if (!PhotonNetwork.IsMasterClient || ended || !PhotonNetwork.InRoom) return;
+
+        //  No evaluar si la ronda no está activa
+        if (!roundActive) return;
+
+        var players = PhotonNetwork.PlayerList;
+        var alive = players.Where(PlayerPropsUtil.IsAlive).ToList();
+        int ghosts = players.Count(p => PlayerPropsUtil.GetState(p) == PlayerState.Ghost);
+        int elim = players.Count(p => PlayerPropsUtil.GetState(p) == PlayerState.Eliminated);
+
+        if (alive.Count == 0)
         {
-            if (!p.gameObject.activeInHierarchy) continue;
-            if (!p.CompareTag("Player")) continue;       // Solo "vivos"
-            PhotonView pv = p.GetComponent<PhotonView>();
-            if (pv == null) continue;
-
-            aliveCount++;
-            lastAliveOwner = pv.Owner;
+            EndAllLose();
         }
-
-        if (aliveCount == 1 && lastAliveOwner != null)
+        else if (alive.Count == 1)
         {
-            var props = new Hashtable
-            {
-                { GAME_ENDED_KEY, true },
-                { WINNER_KEY, lastAliveOwner.ActorNumber }
-            };
-            PhotonNetwork.CurrentRoom.SetCustomProperties(props);
-            Debug.Log($"[GameEndManager] Winner: {lastAliveOwner.NickName} ({lastAliveOwner.ActorNumber})");
+            // Solo declarar ganador si la ronda empezó con 2+ o ya hubo bajas
+            if (startCount >= minPlayersToWin || ghosts + elim > 0)
+                EndWithWinner(alive[0]);
         }
+        // >1 vivos: sigue
+    }
 
-        // (Opcional) Empate: si aliveCount == 0 podrías setear empate con WINNER = -1
+    public void EndWithWinner(Player winner)
+    {
+        if (ended || !PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient) return;
+        ended = true;
+
+        var h = new Hashtable {
+        { MatchProps.GAME_ENDED, true },
+        { MatchProps.ALL_LOSE,   false },
+        { MatchProps.WINNER,     winner.ActorNumber },
+        { MatchProps.ROUND_ACTIVE, false } // opcional
+    };
+
+        // 1) Publicar fin
+        PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+
+        // 2) Cerrar e invisibilizar la sala
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
+
+        if (log) Debug.Log($"[End] Winner={winner.ActorNumber}");
+    }
+
+    public void EndAllLose()
+    {
+        if (ended || !PhotonNetwork.InRoom || !PhotonNetwork.IsMasterClient) return;
+        ended = true;
+
+        var h = new Hashtable {
+        { MatchProps.GAME_ENDED, true },
+        { MatchProps.ALL_LOSE,   true },
+        { MatchProps.WINNER,     null },          // limpiar ganador si hubiera
+        { MatchProps.ROUND_ACTIVE, false }        // opcional
+    };
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(h);
+
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
+
+        if (log) Debug.Log("[End] ALL LOSE");
+    }
+
+
+    private static bool ReadBool(string k, Hashtable h)
+    {
+        if (h == null || !h.TryGetValue(k, out var v)) return false;
+        if (v is bool b) return b;
+        if (v is int i) return i != 0;
+        return false;
+    }
+    private static int ReadInt(string k, Hashtable h)
+    {
+        if (h == null || !h.TryGetValue(k, out var v)) return 0;
+        if (v is int i) return i;
+        if (v is string s && int.TryParse(s, out var p)) return p;
+        return 0;
     }
 }
+
+
