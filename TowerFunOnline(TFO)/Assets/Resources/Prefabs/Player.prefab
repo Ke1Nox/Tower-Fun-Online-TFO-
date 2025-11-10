@@ -216,6 +216,9 @@ MonoBehaviour:
   pushHitboxPrefabPath: Prefabs/PushHitbox
   pushOffset: 1
   pushCooldown: 0.6
+  ghostBulletPrefabPath: Prefabs/GhostBulletPush
+  ghostShootCooldown: 0.35
+  ghostMuzzleOffsetX: 0.6
 --- !u!114 &2275569156414613488
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,12 +14,15 @@ public class Bullet : MonoBehaviourPun
     public void Initialize(Vector2 dir)
     {
         direction = dir.normalized;
-        Destroy(gameObject, lifeTime);
+        
+        if (PhotonNetwork.IsMasterClient)
+            Invoke(nameof(NetworkDestroyByLifetime), lifeTime);
     }
 
     void Update()
     {
-        if (!photonView.IsMine) return; // solo el dueño la mueve
+        
+        if (!photonView.IsMine) return;
         transform.Translate(direction * speed * Time.deltaTime);
     }
 
@@ -27,30 +30,20 @@ public class Bullet : MonoBehaviourPun
     {
         if (!other.CompareTag("Player")) return;
 
-        PhotonView view = other.GetComponent<PhotonView>();
-        if (view != null && view.IsMine)
-        {
-            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                // Desactivar gravedad
-                rb.gravityScale = 0f;
+        PhotonView targetView = other.GetComponent<PhotonView>();
+        if (targetView == null) return;
 
-                // Detener movimiento
-                rb.velocity = Vector2.zero;
+        // rpc jugador impactado fantasma y se teletransporte
+        targetView.RPC("RPC_BecomeGhost", targetView.Owner, respawnPosition.x, respawnPosition.y);
 
-                // Teletransportar jugador
-                other.transform.position = respawnPosition;
-                // Cambiar su tag a "Dead" para que la torreta lo ignore
-                other.tag = "Dead";
-
-
-                SimplePlayer.isdead = true;
-            }
-        }
-
-        // Destruir la bala solo si es el master
+        
         if (PhotonNetwork.IsMasterClient)
+            PhotonNetwork.Destroy(gameObject);
+    }
+
+    private void NetworkDestroyByLifetime()
+    {
+        if (PhotonNetwork.IsMasterClient && photonView != null && photonView.IsMine)
             PhotonNetwork.Destroy(gameObject);
     }
 }

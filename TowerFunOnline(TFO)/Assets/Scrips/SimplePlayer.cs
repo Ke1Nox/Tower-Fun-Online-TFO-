@@ -34,6 +34,13 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
     [SerializeField] private float pushOffset = 1f;
     [SerializeField] private float pushCooldown = 0.6f;
 
+    [Header("Ghost Shoot")]
+    [SerializeField] private string ghostBulletPrefabPath = "Prefabs/GhostBulletPush"; // ruta en Resources/ o Pool de PUN
+    [SerializeField] private float ghostShootCooldown = 0.35f;
+    [SerializeField] private float ghostMuzzleOffsetX = 0.6f; 
+
+    private float lastGhostShotTime = -999f;
+
     static public bool isdead = false;
     private float lastPushTime = -999f;
 
@@ -72,6 +79,14 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         {
             DoPush();
             lastPushTime = Time.time;
+        }
+
+        //fantasma 
+        // Disparo fantasma con ESPACIO (solo cuando está "Dead")
+        if (CompareTag("Dead") && Input.GetKeyDown(KeyCode.Space) && Time.time - lastGhostShotTime >= ghostShootCooldown)
+        {
+            lastGhostShotTime = Time.time;
+            ShootGhostBullet();
         }
     }
 
@@ -132,6 +147,19 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
             isGrounded = false;
     }
 
+    //disparo fantasma
+    private void ShootGhostBullet()
+    {
+        //spawn nueva baala
+        Vector3 spawnPos = transform.position + new Vector3(-Mathf.Abs(ghostMuzzleOffsetX), 0f, 0f);
+
+        GameObject gb = PhotonNetwork.Instantiate(ghostBulletPrefabPath, spawnPos, Quaternion.identity);
+
+        
+        var bullet = gb.GetComponent<GhostBulletPush>();
+        if (bullet != null) bullet.Initialize(Vector2.left);
+    }
+
     [PunRPC]
     public void RPC_SetNickname(string nickname)
     {
@@ -156,5 +184,19 @@ public class SimplePlayer : MonoBehaviourPunCallbacks
         knockbackUntil = Time.time + knockbackTime;
 
        
+    }
+    [PunRPC]
+    public void RPC_BecomeGhost(float x, float y)
+    {
+        if (!photonView.IsMine) return;
+
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.velocity = Vector2.zero;
+
+        transform.position = new Vector3(x, y, 0f);
+        gameObject.tag = "Dead";
+
+        SimplePlayer.isdead = true;
     }
 }
