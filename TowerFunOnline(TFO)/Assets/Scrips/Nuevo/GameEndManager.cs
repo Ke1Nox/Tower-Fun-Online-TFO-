@@ -94,7 +94,7 @@ public class GameEndManager : MonoBehaviourPunCallbacks
         if (log) Debug.Log($"[End] Winner={winner.ActorNumber}");
 
         // enviar score
-        photonView.RPC(nameof(RPC_SubmitWinnerScore), winner);
+        photonView.RPC(nameof(RPC_SubmitWinnerScore), RpcTarget.All);
     }
 
     public void EndAllLose()

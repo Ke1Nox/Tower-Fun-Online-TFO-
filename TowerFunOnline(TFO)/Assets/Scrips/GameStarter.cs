@@ -61,8 +61,8 @@ public class GameStarter : MonoBehaviourPunCallbacks
         }
 
         // 3) Reactivar SIEMPRE el listener (esté quien esté)
-        var listener = FindObjectOfType<RoomPropertiesListener>();
-        if (listener != null && !listener.enabled) listener.enabled = true;
+        //var listener = FindObjectOfType<RoomPropertiesListener>();
+        //if (listener != null && !listener.enabled) listener.enabled = true;
     }
 
 
