@@ -27,7 +27,11 @@ public class MenuPun : MonoBehaviourPunCallbacks
     public void HandleConnectButton()
     {
         PlayerPrefs.SetString(nicknameKey, nickname);
+
         PhotonNetwork.NickName = nickname.ToUpper();
+
+        // LootLocker
+        PlayerNameHelper.SetPlayerName(nickname.ToUpper());
 
         Debug.Log(nickname + " intenta conectarse...");
         LoadingScreen.ShowConnecting();

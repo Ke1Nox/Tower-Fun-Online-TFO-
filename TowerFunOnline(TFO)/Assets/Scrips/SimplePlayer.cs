@@ -5,6 +5,7 @@ using TMPro;
 
 public class SimplePlayer : MonoBehaviourPunCallbacks
 {
+    private int score = 0;
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI nicknameUI;
 

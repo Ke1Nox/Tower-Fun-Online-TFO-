@@ -92,6 +92,9 @@ public class GameEndManager : MonoBehaviourPunCallbacks
         PhotonNetwork.CurrentRoom.IsVisible = false;
 
         if (log) Debug.Log($"[End] Winner={winner.ActorNumber}");
+
+        // enviar score
+        photonView.RPC(nameof(RPC_SubmitWinnerScore), winner);
     }
 
     public void EndAllLose()
@@ -128,6 +131,26 @@ public class GameEndManager : MonoBehaviourPunCallbacks
         if (v is int i) return i;
         if (v is string s && int.TryParse(s, out var p)) return p;
         return 0;
+    }
+
+
+    [PunRPC]
+    void RPC_SubmitWinnerScore()
+    {
+      
+        var local = PhotonNetwork.LocalPlayer;
+        if (local == null) return;
+
+        if (PhotonNetwork.LocalPlayer.ActorNumber !=
+            (int)PhotonNetwork.CurrentRoom.CustomProperties[MatchProps.WINNER])
+            return;
+
+        // +1 punto por victoria
+        LeaderboardService.SubmitScore
+            (
+            1,
+            "global_highscore"
+        );
     }
 }
 

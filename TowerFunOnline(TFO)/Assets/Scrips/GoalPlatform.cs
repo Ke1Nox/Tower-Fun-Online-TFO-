@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GoalPlatform : MonoBehaviourPun
 {
-    [Tooltip("Asigna el GameEndManager de la escena")]
+ 
     public GameEndManager endMgr;
 
     private void Awake()

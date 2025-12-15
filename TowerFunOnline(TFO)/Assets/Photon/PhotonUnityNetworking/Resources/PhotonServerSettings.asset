@@ -47,6 +47,7 @@ MonoBehaviour:
   - ApplyKnockback2D
   - RPC_ApplyPush
   - RPC_BecomeGhost
+  - RPC_SubmitWinnerScore
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
